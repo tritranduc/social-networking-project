@@ -1,0 +1,94 @@
+POST http://127.0.0.1:8000/auth/login
+Content-Type: application/json
+
+{
+    "username":"tritranduc",
+    "password":"tritranduc"
+}
+###
+POST http://127.0.0.1:8000/auth/register
+Content-Type: application/json
+
+{
+    "username":"tritranduc",
+    "password":"tritranduc",
+    "phone":"123456789",
+    "email":"abc@example.com"
+}
+
+###
+
+POST http://127.0.0.1:8000/post/add
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+
+{
+    "title":"the seconds private post",
+    "content":"the seconds private post",
+    "private":true,
+    "username":["tritranduc1"]
+}
+###
+POST http://127.0.0.1:8000/post/add
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+
+{
+    "title":"the first private post",
+    "content":"the first private post",
+    "private":true,
+    "username":["tritranduc1","tritranduc2"],
+    "friend":["sdhius"]
+}
+###
+POST http://127.0.0.1:8000/post/add
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+
+{
+    "title":"the seconds public post",
+    "content":"the seconds public post"
+}
+
+###
+POST http://127.0.0.1:8000/post/add
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+
+{
+    "title":"the first public post",
+    "content":"the first public post"
+}
+###
+GET http://127.0.0.1:8000/post/public HTTP/1.1
+###
+GET http://127.0.0.1:8000/post/private HTTP/1.1
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+###
+POST http://127.0.0.1:8000/post/update
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+
+{
+    "title":"react",
+    "content":"react.org",
+    "id":"60d9b5709736041f4c116214",
+    "likeCount" : 0,
+    "private":false
+}
+###
+POST http://127.0.0.1:8000/post/delete
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ4NTIzZDAyNzZhZTFlOTg0ZmM1OWIiLCJpYXQiOjE2MjQ3OTc3ODJ9.ZOwfK4rmOpvneGYsTxd3DqiQmlvMh9Fh3rAVLZSwpjE
+
+{
+    "id":"60d9a86ec649be04c83f0863"
+}
+###
+POST http://127.0.0.1:8000/auth/addfriend
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGRhYmU1MjYzMDE4ZjE5ZjQ0M2YzOWUiLCJpYXQiOjE2MjQ5Njc3NjB9.oOFwQDnibpGS7nD2xPd_NSXhldNBVWs1O1A3J70H8MI
+Content-Type: application/json
+
+{
+    "friend":["tritranduc","tritranduc1"]
+}
