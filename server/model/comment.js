@@ -11,6 +11,10 @@ var comment = new Schema(
       required: true,
       ref: 'Users',
     },
+    postId: {
+      type: Schema.Types.ObjectId,
+      ref:"Posts"
+    }
   },
   { timestamps: true },
 )

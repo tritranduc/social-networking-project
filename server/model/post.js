@@ -29,6 +29,9 @@ var post = new Schema(
         ref: 'Comments',
       },
     ],
+    keyword: [{
+      type: String
+    }]
   },
   { timestamps: true},
 )

@@ -1,5 +1,5 @@
 import { postModel } from '../model/post.js'
-import commentModel from '../model/coment.js'
+import commentModel from '../model/comment.js'
 export var getComment = async (req, res) => {
   var { postId } = req.body
   if (!postId) {
@@ -8,26 +8,12 @@ export var getComment = async (req, res) => {
       .json({ success: false, message: 'postId is require' })
   }
   try {
-    var result = await postModel
-      .findOne({ _id: postId })
-      .populate('comment')
-      .populate('users', ['username'])
-    result = result.comment
-    if (!result) {
-      return res.status(401).json({
-        success: false,
-        message: 'comment not found or user is not Authorization',
-      })
-    }
-    var dataResult = []
-    for (let index = 0; index < result.length; index++) {
-      const element = result[index]
-      var commentTemp = await commentModel
-        .findOne({ _id: element._id })
-        .populate('users', ['username'])
-      dataResult.push(commentTemp)
-    }
-    return res.json({ success: true, comment: dataResult })
+    var result = await commentModel
+      .find({ postId })
+      .populate('users', ['username'])      
+      .populate('postId')
+      .lean()
+    return res.json({ success: true, comment: result })
   } catch (error) {
     console.log(error)
     return res
@@ -49,7 +35,7 @@ export var addComment = async (req, res) => {
       .json({ success: false, message: 'postId is require' })
   }
   try {
-    var commentCreate = { content, users: userId }
+    var commentCreate = { content, users: userId, postId }
     var newComment = new commentModel(commentCreate)
     await newComment.save()
     var postUpdateConditions = { _id: postId }
@@ -63,10 +49,13 @@ export var addComment = async (req, res) => {
     )
     updated = await postModel
       .findOne({ _id: postId })
-      .populate('comment')
       .populate('users', ['username'])
       .lean()
-    console.log(updated)
+    var comment = await commentModel
+      .find({ postId })
+      .populate('users', ['username'])
+      .lean()
+    updated.comment = comment
     if (!updated) {
       return res.status(401).json({
         success: false,

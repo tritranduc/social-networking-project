@@ -9,6 +9,22 @@ function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return re.test(String(email).toLowerCase())
 }
+export var checkUserLogin = async (req, res) => {
+  console.log("checkUserLogin")
+  try {
+    var user = await auth
+      .findById(req.userId)
+      .select(['-password', '-phone', '-email', '-keyword', '-friend'])
+    if (!user)
+      return res.status(400).json({ success: false, message: 'user not found' })
+    res.json({ success: true, user })
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error' })
+  }
+}
 export var register = async (req, res) => {
   var { username, password, phone, email } = req.body
   var data = ''
@@ -110,13 +126,14 @@ export var login = async (req, res) => {
     if (!userInDB) {
       return res
         .status(400)
-        .json({ success: false, message: 'incorrect username or email' })
+        .json({ success: false, message: 'incorrect username or email or password' })
     }
     var passwordVerify = await bcrypt.compare(password, userInDB.password)
     if (!passwordVerify) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'incorrect password' })
+      return res.status(400).json({
+        success: false,
+        message: 'incorrect username or email or password',
+      })
     }
     var accessToken = jwt.sign(
       { userId: userInDB._id },
@@ -209,4 +226,13 @@ export var searchUser = async (req, res) => {
       .status(500)
       .json({ success: false, message: 'Internal Server Error' })
   }
+}
+export var searchFriend = async(req, res) => {
+  var userId = req.userId
+  var user = await auth.findOne({ _id: userId }).populate("friend").lean()
+  if (!user) {
+    return res.status(400).json({success:false,message:"user not found"})
+  }
+  var friend = user.friend
+  return res.json({success:true , friend})
 }

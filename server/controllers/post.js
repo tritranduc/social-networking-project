@@ -1,9 +1,11 @@
 import auth from '../model/auth.js'
 import { postModel } from '../model/post.js'
+import { generateKeywords } from './service.js'
 
 export var addPost = async (req, res) => {
   console.log('add post')
   var { title, content, likeCount, username, attachment } = req.body
+  var keyword = generateKeywords(title)
   attachment = attachment || ''
   var error = []
   if (!title) error.push('title is require')
@@ -20,6 +22,7 @@ export var addPost = async (req, res) => {
     var data = {
       ...req.body,
       users: req.userId,
+      keyword,
     }
     var newPost = new postModel(data)
     await newPost.save(function (err) {
@@ -172,6 +175,80 @@ export var deletePost = async (req, res) => {
       message: 'the post is delete',
       post: deletePost,
     })
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error' })
+  }
+}
+export var getMyAllPost = async (req, res) => {
+  try {
+    var post = await postModel
+      .find({ users: req.userId })
+      .populate('users', ['username'])
+      .populate('comment')
+      .lean()
+    for (var index = 0; index < post.length; index++) {
+      var element = post[index]
+      for (let index = 0; index < element.comment.length; index++) {
+        var element_comment = await element.comment[index]
+        var user = await auth.findOne({ _id: element_comment.users }).lean()
+        var dataPush = [user.username, user._id]
+        element_comment.users = dataPush
+      }
+      console.log(index, element)
+    }
+    return res.json({ success: true, post })
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error' })
+  }
+}
+export var searchPost = async (req, res) => {
+  var search = req.body.search
+  if (!search) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'search key is require' })
+  }
+  try {
+    var post = await postModel
+      .find({ keyword: { $in: search }, private: false })
+      .lean()
+    for (let index = 0; index < post.length; index++) {
+      const element = post[index]
+      var userId = element.users
+      var username = await auth.findOne({ _id: userId })
+      username = username.username
+      post[index].users = username
+    }
+    return res.status(200).json({ success: true, post })
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error' })
+  }
+}
+export var addLike = async (req, res) => {
+  var { postId } = req.body
+  if (!postId)
+    return res
+      .status(400)
+      .json({ success: false, message: 'postId is require' })
+  try {
+    var tempPost = await postModel.findOne({ _id: postId }).lean()
+    var likeCount = tempPost.likeCount + 1
+    console.log(likeCount)
+    var updated = await postModel.findOneAndUpdate(
+      { _id: postId },
+      { likeCount },
+      { new: true },
+    )
+    return res.json({ success: true, post: updated })
   } catch (error) {
     console.log(error)
     return res
