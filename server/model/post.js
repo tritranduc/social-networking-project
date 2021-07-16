@@ -14,7 +14,7 @@ var post = new Schema(
       required: true,
       ref: 'Users',
     },
-    attachment: String,
+    attachment: [String],
     likeCount: {
       type: Number,
       default: 0,

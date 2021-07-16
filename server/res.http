@@ -2,8 +2,8 @@ POST http://127.0.0.1:8000/auth/login
 Content-Type: application/json
 
 {
-    "username":"tritranduc",
-    "password":"tritranduc"
+    "username":"tritranduc11@gmail.com",
+    "password":"0906338191"
 }
 ###
 POST http://127.0.0.1:8000/auth/register
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 POST http://127.0.0.1:8000/post/add
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGUyODY1YjBmOTFkMTFjMDgwYWY4Y2EiLCJpYXQiOjE2MjU2NDAzNzl9.OcUshDzhVmg3CaHFECrYU8wQQ0WK5z-Rb4zBo1ruQ2o
 
 {
     "title":"the seconds private post",
@@ -31,7 +31,7 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5Y
 ###
 POST http://127.0.0.1:8000/post/add
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGUyODY1YjBmOTFkMTFjMDgwYWY4Y2EiLCJpYXQiOjE2MjU2NDAzNzl9.OcUshDzhVmg3CaHFECrYU8wQQ0WK5z-Rb4zBo1ruQ2o
 
 {
     "title":"the first private post",
@@ -43,7 +43,7 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5Y
 ###
 POST http://127.0.0.1:8000/post/add
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGUyODY1YjBmOTFkMTFjMDgwYWY4Y2EiLCJpYXQiOjE2MjU2NDAzNzl9.OcUshDzhVmg3CaHFECrYU8wQQ0WK5z-Rb4zBo1ruQ2o
 
 {
     "title":"the seconds public post",
@@ -53,21 +53,21 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5Y
 ###
 POST http://127.0.0.1:8000/post/add
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGUyODY1YjBmOTFkMTFjMDgwYWY4Y2EiLCJpYXQiOjE2MjU2NDAzNzl9.OcUshDzhVmg3CaHFECrYU8wQQ0WK5z-Rb4zBo1ruQ2o
 
 {
     "title":"the first public post",
-    "content":"the first public post"
+    "content":"the first public post tritranduc"
 }
 ###
 GET http://127.0.0.1:8000/post/public HTTP/1.1
 ###
 GET http://127.0.0.1:8000/post/private HTTP/1.1
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGUyODY1YjBmOTFkMTFjMDgwYWY4Y2EiLCJpYXQiOjE2MjU2NDAzNzl9.OcUshDzhVmg3CaHFECrYU8wQQ0WK5z-Rb4zBo1ruQ2o
 ###
 POST http://127.0.0.1:8000/post/update
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQ5YTg2ZWM2NDliZTA0YzgzZjA4NjMiLCJpYXQiOjE2MjQ4ODAzMzV9.m6xOZnO2R0OwcV2_3rolwJbT3B-rugZgDSW5p1NxDoU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGUyODY1YjBmOTFkMTFjMDgwYWY4Y2EiLCJpYXQiOjE2MjU2NDAzNzl9.OcUshDzhVmg3CaHFECrYU8wQQ0WK5z-Rb4zBo1ruQ2o
 
 {
     "title":"react",

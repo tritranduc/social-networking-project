@@ -10,7 +10,7 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase())
 }
 export var checkUserLogin = async (req, res) => {
-  console.log("checkUserLogin")
+  console.log('checkUserLogin')
   try {
     var user = await auth
       .findById(req.userId)
@@ -124,9 +124,10 @@ export var login = async (req, res) => {
         email: username,
       }))
     if (!userInDB) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'incorrect username or email or password' })
+      return res.status(400).json({
+        success: false,
+        message: 'incorrect username or email or password',
+      })
     }
     var passwordVerify = await bcrypt.compare(password, userInDB.password)
     if (!passwordVerify) {
@@ -188,8 +189,6 @@ export var addFriend = async (req, res) => {
       friendId.push(friendInfo._id)
     }
   }
-
-  console.log(friendId)
   try {
     var friendInDB = [...userInfo.friend, ...friendId]
     var updated = { friend: friendInDB }
@@ -227,12 +226,29 @@ export var searchUser = async (req, res) => {
       .json({ success: false, message: 'Internal Server Error' })
   }
 }
-export var searchFriend = async(req, res) => {
+export var searchFriend = async (req, res) => {
   var userId = req.userId
-  var user = await auth.findOne({ _id: userId }).populate("friend").lean()
+  var user = await auth.findOne({ _id: userId }).populate('friend').lean()
   if (!user) {
-    return res.status(400).json({success:false,message:"user not found"})
+    return res.status(400).json({ success: false, message: 'user not found' })
   }
   var friend = user.friend
-  return res.json({success:true , friend})
+  return res.json({ success: true, friend })
+}
+export var getUserInfo = async (req, res) => {
+  var { userId } = req
+  try {
+    var user = await auth
+      .findOne({ _id: userId })
+      .select(['-password', '-keyword'])
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'user not found' })
+    }
+    return res.json({ success: true, user })
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error' })
+  }
 }

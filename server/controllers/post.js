@@ -1,28 +1,45 @@
 import auth from '../model/auth.js'
 import { postModel } from '../model/post.js'
 import { generateKeywords } from './service.js'
+import fs from 'fs'
 
 export var addPost = async (req, res) => {
   console.log('add post')
-  var { title, content, likeCount, username, attachment } = req.body
-  var keyword = generateKeywords(title)
-  attachment = attachment || ''
+  var { title, content, likeCount, username } = req.body
+  var attachment
+  var FilePath = ['']
+  if (req.files) {
+    req.files.map((item) => {
+      FilePath.push(`/uploads/${item.filename}`)
+    })
+    FilePath = FilePath.slice(1)
+  }
+  if (FilePath.length == 0) {
+    FilePath = ['']
+  }
+  attachment = FilePath
   var error = []
   if (!title) error.push('title is require')
-  content = content || ''
+  content = content || ['']
   if (username) {
     if (username.length <= 0) {
       error.push('username must is the array')
     }
   }
   req.body.private = req.body.private || false
-  if (error.length > 0)
+  if (error.length > 0) {
+    req.files.map((imageFile) => {
+      fs.unlinkSync(imageFile.path)
+    })
     return res.status(400).json({ success: false, message: error })
+  }
+  var keyword = generateKeywords(title)
   try {
     var data = {
       ...req.body,
       users: req.userId,
       keyword,
+      attachment,
     }
     var newPost = new postModel(data)
     await newPost.save(function (err) {
@@ -83,13 +100,13 @@ export var getPrivatePost = async (req, res) => {
       const element = posts[index].users
       var dataUser = await auth.findOne({ username: element.username })
       if (req.userId == dataUser._id || req.userId in dataUser.friend) {
-        newPost.push(element)
+        newPost.push(posts[index])
       }
     }
     return res.json({
       success: true,
       message: 'happy this is all post you can watch',
-      posts,
+      posts: newPost,
     })
   } catch (error) {
     console.log(error)
@@ -99,10 +116,29 @@ export var getPrivatePost = async (req, res) => {
   }
 }
 export var updatePost = async (req, res) => {
-  var { title, content, likeCount, username, attachment, id } = req.body
+  console.log('updatePost')
+  var { title, content, likeCount, username } = req.body
+  var { id } = req.body
+  var FilePath = ['']
+  var fullUrl = req.protocol + '://' + req.get('host')
+  if (req.files) {
+    req.files.map((item) => {
+      FilePath.push(`${fullUrl}/uploads/${item.filename}`)
+    })
+    FilePath = FilePath.slice(1)
+  }
+  if (FilePath.length == 0) {
+    FilePath = ['']
+  }
+  attachment = FilePath
+
+  var postsTemp = await postModel.findOne({ _id: id }).lean()
+  postsTemp.attachment.map((file) => {
+    var fileDelete = `./public${file}`
+    fs.unlinkSync(fileDelete)
+  })
   var privateStatus = req.body.private
   var error = []
-  attachment = attachment || ''
   if (!title) error.push('title is require')
   if (!id) error.push('id is require')
   content = content || ''
@@ -114,9 +150,13 @@ export var updatePost = async (req, res) => {
       error.push('username must is the array')
     }
   }
-
-  if (error.length > 0)
+  if (error.length > 0) {
+    req.files.map((imageFile) => {
+      fs.unlinkSync(imageFile.path)
+    })
     return res.status(400).json({ success: false, message: error })
+  }
+  var keyword = generateKeywords(title)
   try {
     var postTemp = await postModel.findOne({ _id: id }).lean()
     likeCount = postTemp.likeCount + 1 || likeCount
@@ -128,6 +168,7 @@ export var updatePost = async (req, res) => {
         attachment,
         likeCount,
         private: privateStatus,
+        keyword,
       }
     } else {
       updated = {
@@ -135,6 +176,7 @@ export var updatePost = async (req, res) => {
         content,
         attachment,
         likeCount,
+        keyword,
       }
     }
     var postUpdateConditions = { _id: id, users: req.userId }
@@ -170,6 +212,12 @@ export var deletePost = async (req, res) => {
         message: 'post not found or user is not Authorization',
       })
     }
+    if (deletePost.attachment[0] !== '') {
+      deletePost.attachment.map((file) => {
+        var fileDelete = `./public${file}`
+        fs.unlinkSync(fileDelete)
+      })
+    }
     return res.json({
       success: true,
       message: 'the post is delete',
@@ -197,7 +245,6 @@ export var getMyAllPost = async (req, res) => {
         var dataPush = [user.username, user._id]
         element_comment.users = dataPush
       }
-      console.log(index, element)
     }
     return res.json({ success: true, post })
   } catch (error) {
