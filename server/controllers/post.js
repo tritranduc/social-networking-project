@@ -119,24 +119,25 @@ export var updatePost = async (req, res) => {
   console.log('updatePost')
   var { title, content, likeCount, username } = req.body
   var { id } = req.body
-  var FilePath = ['']
-  var fullUrl = req.protocol + '://' + req.get('host')
-  if (req.files) {
-    req.files.map((item) => {
-      FilePath.push(`${fullUrl}/uploads/${item.filename}`)
+  if (!req.body.curredImage) {
+    var FilePath = ['']
+    if (req.files) {
+      req.files.map((item) => {
+        FilePath.push(`/uploads/${item.filename}`)
+      })
+      FilePath = FilePath.slice(1)
+    }
+    if (FilePath.length == 0) {
+      FilePath = ['']
+    }
+    attachment = FilePath
+    var postsTemp = await postModel.findOne({ _id: id }).lean()
+    postsTemp.attachment.map((file) => {
+      var fileDelete = `./public${file}`
+      fs.unlinkSync(fileDelete)
     })
-    FilePath = FilePath.slice(1)
   }
-  if (FilePath.length == 0) {
-    FilePath = ['']
-  }
-  attachment = FilePath
-
-  var postsTemp = await postModel.findOne({ _id: id }).lean()
-  postsTemp.attachment.map((file) => {
-    var fileDelete = `./public${file}`
-    fs.unlinkSync(fileDelete)
-  })
+  var postsResult = await postModel.findOne({ _id: id }).lean()
   var privateStatus = req.body.private
   var error = []
   if (!title) error.push('title is require')
@@ -161,22 +162,41 @@ export var updatePost = async (req, res) => {
     var postTemp = await postModel.findOne({ _id: id }).lean()
     likeCount = postTemp.likeCount + 1 || likeCount
     let updated
-    if (typeof privateStatus !== 'undefined') {
-      updated = {
-        title,
-        content,
-        attachment,
-        likeCount,
-        private: privateStatus,
-        keyword,
+    if (req.body.curredImage) {
+      if (typeof privateStatus !== 'undefined') {
+        updated = {
+          title,
+          content,
+          likeCount,
+          private: privateStatus,
+          keyword,
+        }
+      } else {
+        updated = {
+          title,
+          content,
+          likeCount,
+          keyword,
+        }
       }
     } else {
-      updated = {
-        title,
-        content,
-        attachment,
-        likeCount,
-        keyword,
+      if (typeof privateStatus !== 'undefined') {
+        updated = {
+          title,
+          content,
+          attachment,
+          likeCount,
+          private: privateStatus,
+          keyword,
+        }
+      } else {
+        updated = {
+          title,
+          content,
+          attachment,
+          likeCount,
+          keyword,
+        }
       }
     }
     var postUpdateConditions = { _id: id, users: req.userId }
@@ -193,6 +213,7 @@ export var updatePost = async (req, res) => {
       success: true,
       message: 'happy the post is in database',
       post: updated,
+      oldPost: postsResult,
     })
   } catch (error) {
     console.log(error)
