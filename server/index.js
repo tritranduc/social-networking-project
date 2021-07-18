@@ -33,6 +33,10 @@ app.use(express.static('./public'))
 app.use(upload.array('attachment'))
 app.use(validation)
 
+app.get('/', (req, res) => {
+  res.send('server ok')
+})
+
 app.use('/auth', auth)
 app.use('/post', post)
 app.use('/comment', comment)
