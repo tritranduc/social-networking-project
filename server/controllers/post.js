@@ -2,6 +2,7 @@ import auth from '../model/auth.js'
 import { postModel } from '../model/post.js'
 import { generateKeywords } from './service.js'
 import fs from 'fs'
+import { log } from 'console'
 
 export var addPost = async (req, res) => {
   console.log('add post')
@@ -21,11 +22,7 @@ export var addPost = async (req, res) => {
   var error = []
   if (!title) error.push('title is require')
   content = content || ['']
-  if (username) {
-    if (username.length <= 0) {
-      error.push('username must is the array')
-    }
-  }
+
   req.body.private = req.body.private || false
   if (error.length > 0) {
     req.files.map((imageFile) => {
@@ -117,88 +114,53 @@ export var getPrivatePost = async (req, res) => {
 }
 export var updatePost = async (req, res) => {
   console.log('updatePost')
-  var { title, content, likeCount, username } = req.body
+  var { title, content, likeCount } = req.body
   var { id } = req.body
-  if (!req.body.curredImage) {
-    var FilePath = ['']
-    if (req.files) {
-      req.files.map((item) => {
-        FilePath.push(`/uploads/${item.filename}`)
-      })
-      FilePath = FilePath.slice(1)
-    }
-    if (FilePath.length == 0) {
-      FilePath = ['']
-    }
-    attachment = FilePath
-    var postsTemp = await postModel.findOne({ _id: id }).lean()
-    postsTemp.attachment.map((file) => {
-      var fileDelete = `./public${file}`
-      fs.unlinkSync(fileDelete)
-    })
-  }
-  var postsResult = await postModel.findOne({ _id: id }).lean()
-  var privateStatus = req.body.private
+  likeCount = parseInt(likeCount)
   var error = []
   if (!title) error.push('title is require')
   if (!id) error.push('id is require')
-  content = content || ''
-  var postTemp = await postModel.findOne({ _id: id }).lean()
-
-  likeCount = postTemp.likeCount + 1 || likeCount
-  if (username) {
-    if (username.length <= 0) {
-      error.push('username must is the array')
-    }
+  var { id } = req.body
+  log(req.body.PhotoUrl)
+  if (req.body.PhotoUrl != '' && req.body.PhotoUrl) {
+    var attachmentMain = [...req.body.PhotoUrl]
+  } else {
+    var attachmentMain = []
   }
+  var FilePath = ['']
+  if (req.files) {
+    req.files.map((item) => {
+      FilePath.push(`/uploads/${item.filename}`)
+    })
+    FilePath = FilePath.slice(1)
+  }
+  if (FilePath.length == 0) {
+    FilePath = ['']
+  }
+  attachmentMain = [...attachmentMain, ...FilePath]
+  var attachment = attachmentMain
+  attachment = attachment.filter((url) => url !== '')
+
+  req.body.content = content || ''
+
   if (error.length > 0) {
     req.files.map((imageFile) => {
       fs.unlinkSync(imageFile.path)
     })
     return res.status(400).json({ success: false, message: error })
   }
+  if (req.body.DeleteImageUrl) {
+    req.body.DeleteImageUrl.map((item) => {
+      var filePath = `./public${item}`
+      fs.unlinkSync(filePath)
+      attachment = attachment.filter((url) => url !== item)
+    })
+  }
   var keyword = generateKeywords(title)
   try {
-    var postTemp = await postModel.findOne({ _id: id }).lean()
-    likeCount = postTemp.likeCount + 1 || likeCount
     let updated
-    if (req.body.curredImage) {
-      if (typeof privateStatus !== 'undefined') {
-        updated = {
-          title,
-          content,
-          likeCount,
-          private: privateStatus,
-          keyword,
-        }
-      } else {
-        updated = {
-          title,
-          content,
-          likeCount,
-          keyword,
-        }
-      }
-    } else {
-      if (typeof privateStatus !== 'undefined') {
-        updated = {
-          title,
-          content,
-          attachment,
-          likeCount,
-          private: privateStatus,
-          keyword,
-        }
-      } else {
-        updated = {
-          title,
-          content,
-          attachment,
-          likeCount,
-          keyword,
-        }
-      }
-    }
+    updated = { ...req.body, keyword, attachment }
+    log(req.body)
     var postUpdateConditions = { _id: id, users: req.userId }
     updated = await postModel.findOneAndUpdate(postUpdateConditions, updated, {
       new: true,
@@ -213,7 +175,6 @@ export var updatePost = async (req, res) => {
       success: true,
       message: 'happy the post is in database',
       post: updated,
-      oldPost: postsResult,
     })
   } catch (error) {
     console.log(error)
@@ -235,8 +196,10 @@ export var deletePost = async (req, res) => {
     }
     if (deletePost.attachment[0] !== '') {
       deletePost.attachment.map((file) => {
-        var fileDelete = `./public${file}`
-        fs.unlinkSync(fileDelete)
+        if (file !== null) {
+          var fileDelete = `./public${file}`
+          fs.unlinkSync(fileDelete)
+        }
       })
     }
     return res.json({

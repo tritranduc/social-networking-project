@@ -4,7 +4,10 @@ function contains(target, pattern) {
   var value = 0
 
   pattern.forEach(function (word) {
-    if (path.extname(target.originalname) === word) {
+    if (
+      path.extname(target.originalname) === word ||
+      path.extname(target.originalname) === word.toUpperCase()
+    ) {
       value = value + 1
     }
   })
